@@ -26,19 +26,17 @@ export default function App() {
 
   // 2. 앱 기능 상태
   const [isWriting, setIsWriting] = useState(false);
+  const [writeInitialDate, setWriteInitialDate] = useState(null); // 달력에서 날짜 찍어서 열 때 사용
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   // 3. 일기 데이터 (초기값)
-  const [diaries, setDiaries] = useState([
-    { id: 1, date: "2026. 03. 13", year: 2026, month: 2, day: 13, mood: "😊", title: "첫 알바 시작", content: "경북대 근처 카페에서 알바를 시작했다. 생각보다 메뉴 외우는 게 어렵지만 재미있다.", album: "💿", music: "Energetic Pop Mix", artist: "Various Artists" },
-    { id: 2, date: "2026. 03. 14", year: 2026, month: 2, day: 14, mood: "😐", title: "과제의 늪", content: "IT5호관에서 밤샘 코딩 중... 리액트 네이티브는 알면 알수록 심오하다.", album: "📀", music: "Lofi HipHop", artist: "Chill Study Beats" },
-    { id: 3, date: "2026. 03. 15", year: 2026, month: 2, day: 15, mood: "😭", title: "일요일의 끝", content: "내일 월요일이라니 믿기지 않는다. 주말아 돌아와!", album: "🎸", music: "Relaxing Mood", artist: "Acoustic Soul" },
-  ]);
+  // playlist: [{ title, artist, cover_url, spotify_url, preview_url }]
+  const [diaries, setDiaries] = useState([]);
 
   // --- 기능 함수들 ---
 
-  // 일기 저장
+  // 일기 저장 (WriteModal에서 이미 API 호출 후 playlist가 포함된 entry를 전달)
   const handleSave = (newEntry) => {
     const selectedDate = new Date(newEntry.date);
     const newItem = {
@@ -50,9 +48,9 @@ export default function App() {
       mood: newEntry.mood,
       title: newEntry.title,
       content: newEntry.content,
-      album: "🎵",
-      music: "New Logged Track",
-      artist: "Unknown Artist",
+      weather: newEntry.weather || "맑음",
+      tags: newEntry.tags || [],
+      playlist: newEntry.playlist || [],
     };
     setDiaries([newItem, ...diaries]);
     setIsWriting(false);
@@ -98,14 +96,18 @@ export default function App() {
             <DiaryScreen
               diaries={diaries}
               searchQuery={searchQuery}
-              onDiaryPress={(diary) => setSelectedDiary(diary)} // 클릭 시 상세 화면으로
+              onDiaryPress={(diary) => setSelectedDiary(diary)}
             />
           )}
 
           {currentView === "calendar" && (
             <CalendarScreen
               diaries={diaries}
-              onDiaryClick={(diary) => setSelectedDiary(diary)} // 달력 하단 리스트 클릭 시 상세 화면으로
+              onDiaryClick={(diary) => setSelectedDiary(diary)}
+              onWritePress={(dateString) => {
+                setWriteInitialDate(dateString);
+                setIsWriting(true);
+              }}
             />
           )}
 
@@ -128,8 +130,9 @@ export default function App() {
         {/* 일기 작성 모달 */}
         {isWriting && (
           <WriteModal
-            onClose={() => setIsWriting(false)}
+            onClose={() => { setIsWriting(false); setWriteInitialDate(null); }}
             onSave={handleSave}
+            initialDate={writeInitialDate}
           />
         )}
       </View>
@@ -140,10 +143,10 @@ export default function App() {
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: Colors.background // 일렉트릭 미드나잇 배경
+    backgroundColor: Colors.background,
   },
   appContainer: {
     flex: 1,
-    backgroundColor: Colors.background
+    backgroundColor: Colors.background,
   },
 });

@@ -12,7 +12,7 @@ import DiaryCard from "../components/DiaryCard";
 
 const { width } = Dimensions.get("window");
 
-export default function CalendarScreen({ diaries }) {
+export default function CalendarScreen({ diaries, onDiaryClick, onWritePress }) {
     // 1. 상태 관리
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedDiaries, setSelectedDiaries] = useState([]);
@@ -37,6 +37,13 @@ export default function CalendarScreen({ diaries }) {
             (d) => d.year === year && d.month === month && d.day === day
         );
         setSelectedDiaries(filtered);
+
+        // 일기가 없는 날짜면 WriteModal 열기
+        if (filtered.length === 0) {
+            const mm = String(month + 1).padStart(2, "0");
+            const dd = String(day).padStart(2, "0");
+            onWritePress && onWritePress(`${year}-${mm}-${dd}`);
+        }
     };
 
     // 4. 개별 날짜 렌더링
@@ -96,7 +103,7 @@ export default function CalendarScreen({ diaries }) {
                 renderItem={({ item }) => (
                     <DiaryCard
                         item={item}
-                        onPress={(d) => console.log("Detail View:", d)}
+                        onPress={(d) => onDiaryClick && onDiaryClick(d)}
                     />
                 )}
 

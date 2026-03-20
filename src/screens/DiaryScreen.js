@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from "react-native";
 import { Colors } from "../styles/theme";
 
-export default function DiaryScreen({ diaries, searchQuery }) {
+export default function DiaryScreen({ diaries, searchQuery, onDiaryPress }) {
     // 실제 사용자 이름 (예시)
     const userName = "사용자";
     const filteredDiaries = diaries.filter(d =>
@@ -28,14 +28,16 @@ export default function DiaryScreen({ diaries, searchQuery }) {
 
             <Text style={styles.sectionTitle}>Recent Path</Text>
             {filteredDiaries.map((item) => (
-                <View key={item.id} style={styles.logCard}>
+                <TouchableOpacity key={item.id} style={styles.logCard} onPress={() => onDiaryPress(item)} activeOpacity={0.7}>
                     <Text style={styles.logDate}>{item.date}</Text>
                     <Text style={styles.logTitle}>{item.title}</Text>
                     <View style={styles.logFooter}>
                         <Text style={styles.logMood}>{item.mood}</Text>
-                        <Text style={styles.logMusic}>🎧 {item.music}</Text>
+                        <Text style={styles.logMusic}>
+                            🎧 {(item.playlist && item.playlist[0]) ? item.playlist[0].title : (item.music || "—")}
+                        </Text>
                     </View>
-                </View>
+                </TouchableOpacity>
             ))}
         </ScrollView>
     );

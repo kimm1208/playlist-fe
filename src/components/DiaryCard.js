@@ -1,9 +1,12 @@
 // src/components/DiaryCard.js
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
 import { Colors } from "../styles/theme";
 
 export default function DiaryCard({ item, onPress }) {
+    const firstTrack = item.playlist && item.playlist.length > 0 ? item.playlist[0] : null;
+    const trackName = firstTrack ? firstTrack.title : (item.music || "No track");
+
     return (
         <TouchableOpacity style={styles.diaryCard} onPress={() => onPress(item)} activeOpacity={0.7}>
             <View style={styles.cardLeft}>
@@ -20,10 +23,13 @@ export default function DiaryCard({ item, onPress }) {
             {/* 음악 재생 영역을 다크 스퀘어로 모던하게 */}
             <TouchableOpacity
                 style={styles.cardRight}
-                onPress={() => Alert.alert("Play", `${item.music}`)}
+                onPress={() => Alert.alert("Play", trackName)}
                 activeOpacity={0.8}
             >
-                <Text style={styles.albumIcon}>💿</Text>
+                {firstTrack?.cover_url
+                    ? <Image source={{ uri: firstTrack.cover_url }} style={styles.albumImage} />
+                    : <Text style={styles.albumIcon}>💿</Text>
+                }
                 <View style={styles.playBar} />
             </TouchableOpacity>
         </TouchableOpacity>
@@ -52,12 +58,14 @@ const styles = StyleSheet.create({
     contentText: { color: Colors.subText, fontSize: 14, lineHeight: 20 },
     cardRight: {
         width: 70, height: 70,
-        backgroundColor: Colors.secondary, // 딥 네이비
+        backgroundColor: Colors.secondary,
         borderRadius: 15,
         alignItems: "center", justifyContent: "center",
-        alignSelf: 'center'
+        alignSelf: 'center',
+        overflow: 'hidden',
     },
     albumIcon: { fontSize: 28 },
+    albumImage: { width: 70, height: 70, borderRadius: 15 },
     playBar: {
         width: 30, height: 3, backgroundColor: Colors.primary, // 민트 포인트
         borderRadius: 2, marginTop: 8

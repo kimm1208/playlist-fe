@@ -8,16 +8,21 @@ export default function PlaylistScreen({ diaries }) {
             <FlatList
                 data={diaries}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.musicItem}>
-                        <Text style={styles.albumArt}>{item.album}</Text>
-                        <View style={styles.musicInfo}>
-                            <Text style={styles.musicTitle}>{item.music}</Text>
-                            <Text style={styles.musicSub}>{item.date} - {item.title}</Text>
+                renderItem={({ item }) => {
+                    const firstTrack = item.playlist && item.playlist.length > 0 ? item.playlist[0] : null;
+                    const trackTitle = firstTrack ? firstTrack.title : (item.music || "—");
+
+                    return (
+                        <View style={styles.musicItem}>
+                            <Text style={styles.albumArt}>💿</Text>
+                            <View style={styles.musicInfo}>
+                                <Text style={styles.musicTitle}>{trackTitle}</Text>
+                                <Text style={styles.musicSub}>{item.date} - {item.title}</Text>
+                            </View>
+                            <Text style={{ fontSize: 20 }}>▶️</Text>
                         </View>
-                        <Text style={{ fontSize: 20 }}>▶️</Text>
-                    </View>
-                )}
+                    );
+                }}
             />
         </View>
     );
